@@ -1,26 +1,28 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-namespace Fishing
-{
-    public static class BoidHelper
-    {
-        // Returns a stable array of directions with roughly even distribution on the unit sphere.
-        public static Vector3[] GetViewDirections(int count)
-        {
-            count = Mathf.Clamp(count, 6, 256);
-            Vector3[] dirs = new Vector3[count];
-            const float PHI = 1.61803398875f; // golden ratio
-            for (int i = 0; i < count; i++)
-            {
-                float t = (i + 0.5f) / count;
-                float theta = 2f * Mathf.PI * t * PHI;
-                float z = 1f - 2f * t;
-                float r = Mathf.Sqrt(1f - z * z);
-                float x = r * Mathf.Cos(theta);
-                float y = r * Mathf.Sin(theta);
-                dirs[i] = new Vector3(x, z, y); // swap around to get a pleasant spread
-            }
-            return dirs;
+public static class BoidHelper {
+
+    const int numViewDirections = 300;
+    public static readonly Vector3[] directions;
+
+    static BoidHelper () {
+        directions = new Vector3[BoidHelper.numViewDirections];
+
+        float goldenRatio = (1 + Mathf.Sqrt (5)) / 2;
+        float angleIncrement = Mathf.PI * 2 * goldenRatio;
+
+        for (int i = 0; i < numViewDirections; i++) {
+            float t = (float) i / numViewDirections;
+            float inclination = Mathf.Acos (1 - 2 * t);
+            float azimuth = angleIncrement * i;
+
+            float x = Mathf.Sin (inclination) * Mathf.Cos (azimuth);
+            float y = Mathf.Sin (inclination) * Mathf.Sin (azimuth);
+            float z = Mathf.Cos (inclination);
+            directions[i] = new Vector3 (x, y, z);
         }
     }
+
 }
